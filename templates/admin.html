@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/images/icon.ico">
+    <link rel="stylesheet" href="../static/style.css"> 
+    <title>Attendance System</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    <style>
+        #accType,#accExists{
+            width:175px;
+            height:25px;
+        }
+        #accCreate,#loginLink{
+            display:block;
+            position:fixed;
+            z-index:1000;
+            top:0;
+            width:100%;
+            height:100%;
+            background-color:rgba(0,0,0,0.75);
+            visibility:hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.5s linear;
+    }
+    .account,#linkContainer{ 
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content: center;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform : translate(-50%, -50%);
+    width:305px;  
+    height:450px;
+    background-color:#ffe5cc;
+    border-radius:7.5px;
+    text-align: center; 
+    }
+    #linkContainer{
+        height:275px;
+        width:300px;
+    }
+    #msg{
+        margin: top 5px;
+        display:inline-block;
+        visibility:hidden;
+    }
+    a{
+        text-decoration: none;
+        color:black;
+    }
+    #inputLink{
+            opacity:0;
+        }
+    #linkContainer > div{
+        background-color: rgba(255, 255, 255, 0.5);;
+        width:275px;
+        height:100px;
+    }
+    #copy{
+        background:url('../static/images/copy.jpg');
+        width:24px;
+        height:24px;
+        float: right;
+        margin-top:10px;
+        margin-bottom:20px;
+        cursor: pointer;
+        border:none;
+        
+    }
+    #authCode{
+        border-radius:5px;
+        height:40px;
+        background-color:#d6d8db;
+        visibility: hidden;
+        opacity:0;
+        transition: visibility 0s, opacity 0.5s linear;
+    }
+    h2{
+        padding-top:10px;
+    }
+   .closeBtns{
+        float: right;
+        margin-left:250px;
+        border:none;
+        background-color: transparent;
+        font-size:16px;
+        cursor: pointer;
+    }
+    #authCode > p{
+        padding:10px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    </style>
+</head>
+<body onload="updateTableData()">
+    <button onclick="showSidebar()" id="btn" style="font-size: 32px">&#9776;</button>
+    <div id="sidebar">
+        <button id="btn2" onclick="closeSidebar()" style="line-height: 20px; float: right">
+            Close&nbsp;&#10006;</button><br>
+            <button class="btns" onclick="createCode()">Create code</button><br>
+            <button class="btns" onclick="createLink()">Create login link</button><br>
+            <button class="btns" onclick="uploadFiles()">Upload User Photos</button><br>
+            <button class="btns" onclick="getUploadedFiles()">View User Photos </button><br>
+            <button class="btns" onclick="showSignup()">Manage Users</button><br>
+            <button class="btns" onclick="getDownloadFiles()">Download User Photos</button><br>
+            <button class="btns" onclick="getAtdRecords()">Attendance Records</button><br>
+            <button class="btns" onclick="logout()">Logout</button>
+    </div>
+        <form id="loginLink">
+        <div id="linkContainer">
+            <button type="button" onclick="closeParentElement(this.parentNode.parentNode.id)" class="closeBtns" >&#10006;</button>
+            <h2>User login link</h2>
+            <div>
+                <button type='button' id="copy" onclick="copyLink()"></button><br>
+                <br><a href="" id='userLink'></a>
+            </div>
+            <input id="inputLink" value=""><br>
+        </div>
+    </form>
+    <form id="accCreate">
+        <div class="account">
+            <button type="button" onclick="closeSignup(this.parentNode.parentNode.id)" class="closeBtns">&#10006;</button>
+            <h2>Manage account</h2>
+            <label>Account type<br>
+                <select name="accType" id="accType">
+                    <option value="adminUsers">Admin</option>
+                    <option value="user">User</option>
+                  </select>
+            </label><br>
+            <label> ID<br>
+                <input name="ID" type="tel" maxlength="10" required>
+            </label><br>
+            <label>Password<br>
+                <input name="password" type="password" maxlength="4" required><br>
+            </label><br>
+            <label>If account exists:<br>
+                <select name="accExists" id="accExists">
+                    <option value="delete">Delete account</option>
+                    <option value="update">Update account password</option>
+                  </select>
+            </label>
+            <p id='msg'>ac</p>
+            <button type="button" onclick="createAccount()" id="createBtn">Create account</button>
+        </div>
+    </form>
+    <div id="container">
+        <div id="authCode">
+            <button type="button" onclick="closeParentElement(this.parentNode.id)" class="closeBtns" style="margin-left:0;">&#10006;</button>
+                 <p> Code is </p>   
+        </div>
+        <div id="tableContainer">
+        <h2>Attendance Record</h2>
+        <table id="atdList" frame=void>
+            <tr>
+                <th>Logged In Users</th>
+                <th>Attendance</th>
+            </tr>
+        </table>
+        <button id='csvBtn' onclick="getCSVFile()">Export to CSV</button><br>
+    </div>
+    </div>
+    <form>
+        <label for="myfile">Upload User Photos</label>
+        <input type="file" id="myfile" name="myfile" multiple accept=".jpg"><br><br>
+    </form>
+    <script>
+       async function createCode()  {
+            var authCode=''
+            var res= await fetch("{{ url_for('admin.getAuthCode') }}")
+            var data = await res.json()
+            var el=document.getElementById("authCode");
+            var el2=el.getElementsByTagName('p')[0];
+            el2.innerText="Code is "+data['code'].toString();
+            el.style.visibility="visible";
+            el.style.opacity=1;
+        } 
+        function getDownloadFiles() {
+            window.open("{{ url_for('admin.downloadUserPhotos') }}");
+
+        }
+        function getUploadedFiles() {
+            window.open("{{ url_for('admin.downloadUploadedUserPhotos') }}");
+
+        }
+        function getAtdRecords()
+        {
+            window.open("{{ url_for('admin.getAtdRecords') }}");
+        }
+      function uploadFiles(){
+            var fileInput=document.getElementById("myfile");
+            fileInput.click();
+            fileInput.addEventListener('change',function () {
+                files=[];
+                if (fileInput.files.length != 0)
+                {
+                for(var i=0;i<fileInput.files.length;i++)
+                {
+                    files.push(fileInput.files[i]);
+                }
+                files.forEach(function (imgFile) {
+                    var formData= new FormData();
+                    var req= new XMLHttpRequest();
+                    formData.set('file',imgFile);
+                    req.open("POST","{{ url_for('admin.loadAdminPage') }}")
+                    req.send(formData);
+                    
+                });
+            
+            }
+        })
+            
+        }
+        function showSidebar() {
+            document.getElementById("btn").style.display = "none";
+            document.getElementById("sidebar").style.display = "inline-block";
+        }
+        function closeSidebar() {
+            document.getElementById("sidebar").style.display='none';
+            document.getElementById("btn").style.display = "block";
+            // document.getElementById("sidebar").style.display = "none";
+
+        }
+        function getCSVFile() {
+            var table = document.getElementById("atdList");
+            if(table.rows.length > 1)
+            {
+            window.open("{{ url_for('admin.downloadCSVFile') }}");
+            }
+            else{
+                alert('No attendance has been taken.');
+            }
+
+        }
+        function showSignup()
+        {
+            var el = document.getElementById("accCreate")
+            el.style.position="fixed";
+            el.style.visibility="visible";
+            el.style.opacity="1";
+            document.getElementsByTagName("body")[0].style.overflow="hidden";
+        }
+        function updateTableData() {
+            var data = {{ usrData | tojson }}
+        if (data != undefined) //change to dict is empty
+        {
+            var enrollID = Object.keys(data);
+            var table = document.getElementById("atdList");
+            for (let index = 0; index < enrollID.length; index++) {
+                var row = table.insertRow(index + 1);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                cell1.innerHTML = enrollID[index];
+                cell2.innerHTML = data[enrollID[index]];
+            }
+        }
+        checkTableUpdate();
+        }
+        function closeSignup(parentID)
+        {
+            var el = document.getElementById(parentID);
+            el.style.position="absolute";
+            if (parentID =='accCreate')
+            {
+                el.reset();
+            }
+            closeParentElement(parentID);
+            document.getElementsByTagName("body")[0].style.overflow="scroll";
+
+        }
+       async function createAccount(){
+        var formEl = document.forms.accCreate;
+        var formData= new FormData(formEl);
+        var res= await fetch("{{ url_for('admin.createAcc') }}",{
+            method: 'post',
+            body:formData,
+        })
+        var data = await res.json()
+        if(data['1'] != null)
+        {
+            var el=document.getElementById('msg');
+            el.textContent=data['1'];
+            el.style.visibility="visible";
+        }
+        }
+        function createLink() {
+            var el = document.getElementById("loginLink");
+            el.style.position="fixed";
+            el.style.visibility="visible";
+            el.style.opacity="1";
+            document.getElementsByTagName("body")[0].style.overflow="hidden";
+            var el2=document.getElementById("userLink");
+            var url=window.location.href.replace('admin','login');
+            el2.textContent=url;
+            el2.href=url;
+            document.getElementById("inputLink").value=url;
+            var req= new XMLHttpRequest();
+            req.open( "GET","{{ url_for('admin.setUserInfo') }}"); // false for synchronous request
+            req.send();
+        }
+        function copyLink(){
+            var el2=document.getElementById("inputLink");
+            el2.select();
+            document.execCommand("Copy");
+        }
+        function closeParentElement(parentID) {
+            var el=document.getElementById(parentID);
+            el.style.opacity=0;
+            setTimeout(() => {
+                el.style.visibility="hidden";
+            },550);
+            document.getElementsByTagName("body")[0].style.overflow="scroll";
+        }
+       function logout() {
+            window.open("{{ url_for('admin.adminLogout') }}","_self");
+        }
+        function updateTableRecords(data)
+        {
+            console.log(data)
+            if (data != undefined) //change to dict is empty
+            {
+            var enrollID = Object.keys(data);
+            var table = document.getElementById("atdList");
+            for (var i = 0; i < table.rows.length; i++) {
+                    table.deleteRow(1);
+            }
+            for (let index = 0; index < enrollID.length; index++) {
+                var row = table.insertRow(index+1);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                cell1.innerHTML = enrollID[index];
+                cell2.innerHTML = data[enrollID[index]];
+            }
+        }
+        }
+        async function checkTableUpdate()
+        {
+            url = window.location.href.replace('/admin','/refreshTable')
+            var res= await fetch(url,{
+            method: 'get',
+            })
+            data = await res.json()
+            if(data["res"] == "true")
+            {
+                console.log("working");
+                console.log(data)
+                updateTableRecords(data["userData"]);
+            }
+            setTimeout(checkTableUpdate,10000);
+        }
+    </script>
+</body>
+
+</html>

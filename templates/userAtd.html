@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/images/icon.ico">
+
+    <script src="../static/reload.js"></script>
+    <link rel="stylesheet" href="../static/user.css">
+    <title>Student's Corner</title>
+    <style>
+        #atdImg{
+            max-width:200px;
+            max-height:350px;
+        }
+        button{
+            position:absolute;
+            margin-bottom:-250px;
+        }
+    </style>
+</head>
+<body onload="check()">
+        <form action="{{ url_for('user.userLogout') }}" method="GET">
+        <div class="container">
+             <img id="atdImg" src='../static/images/excl.jpg'>
+            <p id='msg'>You have been marked present.</p><br>
+            <button>LOGOUT</button>
+        </div>
+    </form>
+    <script>
+        function check(){
+        var res={{code | tojson }};
+        if(res['1'] != null)
+        {
+            var el=document.getElementById('msg');
+            el.textContent=res['1'];
+            el.style.visibility="visible";
+            var el2=document.getElementById('atdImg')
+            if (res['1'] =='You have been marked present.')
+            {
+                el2.src='../static/images/tick.jpg';
+                document.getElementById("msg").style.color='green';
+            }
+            else if(res['1'] =='You have been marked absent.')
+            {
+                el2.src='../static/images/cross.jpg';
+            }
+            else
+            {
+                el2.src='../static/images/excl.jpg';
+            }
+        }
+        }
+    </script>
+</body>
+</html>

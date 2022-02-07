@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/images/icon.ico">
+    <link rel="stylesheet" href="../static/user.css">
+    <title>Login</title>
+</head>
+<body onload="check()">
+        <form action="{{ url_for('getAdminData') }}" method="POST">
+        <div class="container">
+            <h2>Login</h2>
+            <label>Admin ID<br>
+                <input name="ID" type="number" maxlength="4">
+            </label><br>
+            <label>Password<br>
+                <input name="password" type="password" maxlength="4"><br>
+                <p id='msg'></p>
+            </label><br>
+            <button>LOGIN</button>
+        </div>
+    </form>
+    <script>
+        function check(){
+        var res={{adminMsg | tojson }};
+        if(res['1'] != 'abc')
+        {
+            var el=document.getElementById('msg');
+            el.textContent=res['1'];
+            el.style.visibility="visible";
+        }
+        }
+    </script>
+</body>
+</html>

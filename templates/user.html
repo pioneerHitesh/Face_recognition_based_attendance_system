@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js" integrity="sha512-dQIiHSl2hr3NWKKLycPndtpbh5iaHLo6MwrXm7F0FM5e+kL2U16oE9uIwPHUl6fQBeCthiEuV/rzP3MiAB8Vfw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/images/icon.ico">
+    <link rel="stylesheet" href="../static/user.css">
+    <title>Student's Corner</title>
+    <style>
+        #camera,input[name="userImg"]{
+            display: none;
+        }
+    </style>
+</head>
+<body onload="check()">
+
+        <form action="{{ url_for('user.loadUserPage') }}"  method="POST">
+        <div class="container">
+            <label>Authentication Code<br><br>
+                <input name="authCo" type="number" maxlength="2" required><br>
+                <p id='msg'></p>
+            </label><br>
+           <input name="userImg" type="text" id="imgFile">
+            <button type="button" onclick="captureImg()">SUBMIT</button>
+        </div>
+    </form>
+    <div id="camera"></div>
+    <script>
+               Webcam.set({
+     width: 640,
+     height: 480,
+     image_format: 'jpeg',
+     jpeg_quality: 90
+ }); 
+    Webcam.attach("#camera");
+    async function captureImg() {
+    Webcam.snap(  function(data_uri) {
+       document.getElementById('imgFile').value= data_uri;
+        Webcam.reset();
+      var form=document.forms;
+      form[0].submit();
+            });
+  
+}
+        function check(){
+        var res={{code | tojson }};
+        if(res['1'] != null)
+        {
+            var el=document.getElementById('msg');
+            el.textContent=res['1'];
+            el.style.visibility="visible";
+        }
+        }
+    </script>
+</body>
+</html>

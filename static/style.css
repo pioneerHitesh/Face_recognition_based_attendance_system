@@ -1,0 +1,120 @@
+
+body{
+    background-color:#f0f2f5;
+    margin:0;
+    width:100vw;
+    height:100vh;
+    background-repeat:no-repeat ;
+    overflow-x: hidden !important;
+}
+#meeting{
+    margin-bottom:20px;
+}
+#container{
+  margin-top:0.5vh;
+    display: table;
+    margin-right:auto;
+    margin-left:auto;
+    border-radius:7px;
+    width:50vw;
+}
+#tableContainer{
+   text-align: center;
+  background-color:#ffe5cc ;
+}
+ table{
+    text-align: center; 
+    border-collapse: collapse;
+    width:100%;
+}
+th{
+  background-color:#d3d3d34d;
+  border-bottom:1px solid black;
+}
+table{
+    border:1px solid black;
+    background-color:rgba(255, 255, 255, 0.5);
+}
+#csvBtn,#createBtn{
+    cursor: pointer;
+    font-weight: bolder;
+    margin-top:10px;
+    margin-bottom:20px;
+    /* width: 125px; */
+    height:30px;
+    border-radius:5px;
+    background-color:#d8c3a566;
+    /* background-image:linear-gradient(to right,#A9F1DF,#FFBBBB); */
+    border:none;
+}
+#btn,#btn2 {
+    z-index: 2;
+    float: left;
+    margin-left: 3.5%;
+    background-color: transparent;
+    border: none;
+    font-family: Pacifico, Helvetica, Courier, monospace;
+    font-size: 20px;
+    cursor: pointer;
+  }
+#sidebar {
+    float: left;
+    margin-left:-1vw;
+    margin-top:-0.5vh;
+    display: none;
+    z-index:4;
+    line-height:4;
+    background-color:#eae7dc99;
+    width:30vw;
+    max-width:250px;
+    height: 100vmax;
+    text-align: center;
+    transition: fade in 0.3s;
+  }
+  @media only screen and (max-width: 425px) {
+    #sidebar{
+      line-height:2;
+      margin-left:-2.5vw;
+    }
+    #container{
+      width:65vw;
+    }
+    .btns{
+      margin-left:7px;
+    }
+  }
+.btns {
+    border:none; 
+    background-color:transparent;
+    width:30vw;
+    font-size:1.05em;
+    max-width:250px;
+    transition: 0.2s;
+    display: block;
+    color: black;
+    font-family: Helvetica, Courier, monospace;
+    cursor: pointer;
+  }
+  @media only screen and (min-width:768px) {
+  .btns:hover {
+    margin-left:5%;
+    letter-spacing:3px;
+  }
+}
+#sidebar {
+    position: relative;
+    animation: animateleft 0.5s;
+  }
+  @keyframes animateleft {
+    from {
+      left: -300px;
+      opacity: 0;
+    }
+    to {
+      left:0;
+      opacity: 1;
+    }
+  }
+form{
+  display:none;
+}
