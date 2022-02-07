@@ -322,12 +322,12 @@
         }
         function updateTableRecords(data)
         {
-            console.log(data)
             if (data != undefined) //change to dict is empty
             {
             var enrollID = Object.keys(data);
             var table = document.getElementById("atdList");
-            for (var i = 0; i < table.rows.length; i++) {
+            var table_len = table.rows.length - 1
+            for (var i = 0; i < table_len; i++) {
                     table.deleteRow(1);
             }
             for (let index = 0; index < enrollID.length; index++) {
@@ -348,8 +348,6 @@
             data = await res.json()
             if(data["res"] == "true")
             {
-                console.log("working");
-                console.log(data)
                 updateTableRecords(data["userData"]);
             }
             setTimeout(checkTableUpdate,10000);
